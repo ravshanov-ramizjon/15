@@ -28,12 +28,13 @@ const navItems = [
  
 export default function Header() {
     return (
-        <header className="w-full text-white px-4 py-4">
+        <header className="w-full text-white px-4 py-4  ">
             <div className="flex justify-center items-center">
-                <div className="w-250 flex justify-between items-center">
+                <div className="w-300 flex justify-between items-center">
                     <div className="flex flex-col gap-2">
                         <div className="flex items-center text-xl font-bold">
-                            <div className="flex items-center">
+                            <div>
+                                <Link href={"/"} className="flex items-center">
                                 <Image
                                     src="/XMLID.svg"
                                     alt="Logo"
@@ -43,6 +44,7 @@ export default function Header() {
                                 />
                                 <span className="text-white">Kino</span>
                                 <span className="text-blue-500">area</span>
+                                </Link>
                             </div>
                         </div>
                         <div className="flex gap-5.5 text-gray-400 text-sm pl-2">

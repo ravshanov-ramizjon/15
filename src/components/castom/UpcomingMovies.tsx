@@ -39,6 +39,23 @@ export default function UpcomingMovies() {
 
     fetchMovies();
   }, []);
+  const [currentPage, setCurrentPage] = useState(1);
+const moviesPerPage = 4;
+
+const totalPages = Math.ceil(movies.length / moviesPerPage);
+
+const handleNextPage = () => {
+  if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
+};
+
+const handlePrevPage = () => {
+  if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+};
+
+const paginatedMovies = movies.slice(
+  (currentPage - 1) * moviesPerPage,
+  currentPage * moviesPerPage
+);
 
   return (
     <div className="mb-8 px-4">
@@ -47,14 +64,25 @@ export default function UpcomingMovies() {
           Ожидаемые новинки
         </h2>
         <div className="flex items-center gap-2 text-white text-sm md:text-base">
-          <button className="p-2 hover:bg-white/10 rounded-full">
-            <ChevronLeft size={20} />
-          </button>
-          <span className="text-white font-medium">2/5</span>
-          <button className="p-2 hover:bg-white/10 rounded-full">
-            <ChevronRight size={20} />
-          </button>
-        </div>
+  <button
+    onClick={handlePrevPage}
+    disabled={currentPage === 1}
+    className="p-2 hover:bg-white/10 rounded-full disabled:opacity-30"
+  >
+    <ChevronLeft size={20} />
+  </button>
+  <span className="text-white font-medium">
+    {currentPage} / {totalPages}
+  </span>
+  <button
+    onClick={handleNextPage}
+    disabled={currentPage === totalPages}
+    className="p-2 hover:bg-white/10 rounded-full disabled:opacity-30"
+  >
+    <ChevronRight size={20} />
+  </button>
+</div>
+
       </div>
 
       {loading ? (
@@ -67,13 +95,13 @@ export default function UpcomingMovies() {
         <div className="text-red-500">{error}</div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {movies.slice(0, 4).map((movie) => (
+          {paginatedMovies.map((movie) => (
             <div
               key={movie.id}
               onClick={() => handleMovieClick(movie)}
               className="rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200"
             >
-              <div className="relative w-full h-[400px]">
+              <div className="relative w-full h-[250]">
                 <Image
                   src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                   alt={movie.title}

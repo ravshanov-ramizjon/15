@@ -46,7 +46,7 @@ export default function NowPlaying() {
       </h2>
 
       {loading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, index) => (
             <Skeleton key={index} className="aspect-[2/3] w-full rounded-lg" />
           ))}
@@ -54,7 +54,7 @@ export default function NowPlaying() {
       ) : error ? (
         <div className="text-red-500">{error}</div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {movies.slice(0, 10).map((movie) => (
             <Card
               key={movie.id}

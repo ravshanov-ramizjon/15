@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useRouter } from 'next/navigation';
 
 type Person = {
   id: number;
@@ -17,6 +18,11 @@ export default function PopularPeople() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>('За год');
+  const router = useRouter();
+  const handleMovieClick = (movie: any) => {
+      localStorage.setItem('selectedMovie', JSON.stringify(movie));
+      router.push('/movie-detail');
+  };
 
   useEffect(() => {
     const API_KEY = localStorage.getItem('API_KEY');
@@ -73,6 +79,7 @@ export default function PopularPeople() {
               <Card
                 key={person.id}
                 className="w-full sm:w-1/2 overflow-hidden border-none bg-muted"
+                onClick={() => handleMovieClick(person)}
               >
                 <CardHeader className="p-0">
                   <div className="relative w-full h-80">
@@ -103,6 +110,7 @@ export default function PopularPeople() {
               <div
                 key={person.id}
                 className="flex justify-between items-center py-2 border-b border-white/10 last:border-none"
+                onClick={() => handleMovieClick(person)}
               >
                 <div>
                   <p className="text-white text-sm font-medium">{person.name}</p>

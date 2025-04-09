@@ -12,17 +12,13 @@ import {
     FaThumbsUp,
     FaThumbsDown,
 } from 'react-icons/fa';
-import { useRouter } from 'next/navigation';
 
 export default function NewTrailers() {
-    const router = useRouter();
-    const handleMovieClick = (movie: any) => {
-        localStorage.setItem('selectedMovie', JSON.stringify(movie));
-        router.push('/movie-detail');
-    };
+
     const [movies, setMovies] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedMovie, setSelectedMovie] = useState<any | null>(null);
 
     useEffect(() => {
         const API_KEY = localStorage.getItem('API_KEY');
@@ -35,6 +31,7 @@ export default function NewTrailers() {
                 );
                 const data = await response.json();
                 setMovies(data.results);
+                setSelectedMovie(data.results[0]);
             } catch (err) {
                 setError('Ошибка при загрузке новых трейлеров');
             } finally {
@@ -75,8 +72,8 @@ export default function NewTrailers() {
                 <>
                     <div className="relative w-full h-[250px] sm:h-[300px] md:h-[400px] mb-8 rounded-xl overflow-hidden">
                         <Image
-                            src={`https://image.tmdb.org/t/p/original${movies[0]?.backdrop_path}`}
-                            alt={movies[0]?.title}
+                            src={`https://image.tmdb.org/t/p/original${selectedMovie?.backdrop_path}`}
+                            alt={selectedMovie?.title}
                             fill
                             className="object-cover"
                         />
@@ -91,11 +88,12 @@ export default function NewTrailers() {
                     <div className="w-full rounded-lg p-2 sm:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-center sm:text-left">
                             <h2 className="text-2xl sm:text-[32px] md:text-[40px] font-bold text-white leading-tight">
-                                {movies[0]?.title?.split(' ').slice(0, -1).join(' ')}{' '}
+                                {selectedMovie?.title?.split(' ').slice(0, -1).join(' ')}{' '}
                                 <span className="text-blue-500">
-                                    {movies[0]?.title?.split(' ').slice(-1)}
+                                    {selectedMovie?.title?.split(' ').slice(-1)}
                                 </span>
                             </h2>
+
                             <div className="flex justify-center sm:justify-start space-x-3 text-gray-400 text-[15px]">
                                 <FaVk />
                                 <FaTelegramPlane />
@@ -120,27 +118,31 @@ export default function NewTrailers() {
                     </div>
 
                     <div className="flex gap-4 overflow-x-auto scrollbar-hide no-scrollbar pb-2">
-                        {movies.slice(1, 6).map((movie) => (
-                            <Card
-                                key={movie.id}
-                                onClick={() => handleMovieClick(movie)}
-                                className="min-w-[160px] md:min-w-[200px] bg-transparent border-none p-0"
-                            >
-                                <div className="relative w-full h-[140px] sm:h-[150px] rounded-lg overflow-hidden">
-                                    <Image
-                                        src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path || movie.poster_path}`}
-                                        alt={movie.title}
-                                        fill
-                                        className="object-cover"
-                                    />
-                                </div>
-                                <CardContent className="mt-2 p-0">
-                                    <CardTitle className="text-sm font-medium text-white line-clamp-2">
-                                        {movie.title}
-                                    </CardTitle>
-                                </CardContent>
-                            </Card>
-                        ))}
+                        {movies
+                            .filter((movie) => movie.id !== selectedMovie?.id)
+                            .slice(0, 5)
+                            .map((movie) => (
+                                <Card
+                                    key={movie.id}
+                                    onClick={() => setSelectedMovie(movie)}
+                                    className="min-w-[160px] md:min-w-[200px] bg-transparent border-none p-0"
+                                >
+                                    <div className="relative w-full h-[140px] sm:h-[150px] rounded-lg overflow-hidden">
+                                        <Image
+                                            src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path || movie.poster_path}`}
+                                            alt={movie.title}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </div>
+                                    <CardContent className="mt-2 p-0">
+                                        <CardTitle className="text-sm font-medium text-white line-clamp-2">
+                                            {movie.title}
+                                        </CardTitle>
+                                    </CardContent>
+                                </Card>
+                            ))}
+
                     </div>
                 </>
             )}

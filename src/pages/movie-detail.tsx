@@ -9,15 +9,21 @@ export default function Details() {
     const storedMovie = localStorage.getItem('selectedMovie');
     if (storedMovie) {
       const movieData = JSON.parse(storedMovie);
-      setMovie(movieData);
+      setMovie(movieData.backdrop_path);
     }
   }, []);
 
   return (
-    <div className="bg-[#1f2535] bg-center bg-cover" style={{ backgroundImage: "url('/A1.png')" }}>
-      <Header />
-      <DetailMain/>
-      <Footer />
-    </div>
+    // <div>
+    //   style={{
+      //     backgroundImage: `url(https://image.tmdb.org/t/p/w500${movie})`,
+      //   }}>
+      //     <div className="absolute top-0 left-0 w-full h-[250%] bg-[#1f2535]/90 bg-opacity-40"></div>
+      /* <div className="absolute top-775 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-center z-10"> */
+       <div className="relative w-full bg-cover bg-center bg-[#1f2535]/90 ">
+        <Header />
+        <DetailMain />
+        <Footer />
+      </div>
   );
 }

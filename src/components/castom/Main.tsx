@@ -10,7 +10,7 @@ import Footer from './Footer';
 export default function MovieCategoryViewer() {
     return (
         <div className='flex justify-center'>
-            <div className="py-4 w-250">
+            <div className="py-4 w-full sm:w-1/2 md:w-1/1 lg:w-1/1 xl:w-300">
                 <NowPlaying />
                 <NewTrailers />
                 <Popular />

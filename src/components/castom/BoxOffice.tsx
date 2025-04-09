@@ -27,11 +27,21 @@ export default function BoxOffice() {
     const fetchMovies = async () => {
       setLoading(true);
       setError(null);
+      setMovies([]); // Очистка данных перед новым запросом
 
       try {
-        const response = await fetch(
-          `https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}&language=ru-RU&page=1`
-        );
+        let language = 'en'; // По умолчанию — язык для всего мира (English)
+        
+        // Задаем язык в зависимости от региона
+        if (activeRegion === 'ru') {
+          language = 'ru-RU'; // Для России
+        } else if (activeRegion === 'us') {
+          language = 'en-US'; // Для США и Канады
+        }
+
+        const url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=${language}&sort_by=revenue.desc&page=1`;
+
+        const response = await fetch(url);
         const data: ApiResponse = await response.json();
         setMovies(data.results.slice(0, 5));
       } catch (err) {
@@ -43,7 +53,7 @@ export default function BoxOffice() {
     };
 
     fetchMovies();
-  }, []);
+  }, [activeRegion]); // Перезапускать запрос при изменении региона
 
   return (
     <div className="py-8 px-4 md:px-8">
@@ -56,22 +66,19 @@ export default function BoxOffice() {
         </div>
 
         <div className="flex gap-4 flex-wrap">
-          {[
-            { label: 'Россия', value: 'ru' },
-            { label: 'Весь мир', value: 'world' },
-            { label: 'США и Канада', value: 'us' },
-          ].map((filter) => (
-            <button
-              key={filter.value}
-              onClick={() => setActiveRegion(filter.value as 'ru' | 'world' | 'us')}
-              className={clsx(
-                'text-white text-sm sm:text-base font-medium transition-opacity',
-                activeRegion === filter.value ? 'underline underline-offset-4' : 'opacity-50 hover:opacity-80'
-              )}
-            >
-              {filter.label}
-            </button>
-          ))}
+          {[{ label: 'Россия', value: 'ru' }, { label: 'Весь мир', value: 'world' }, { label: 'США и Канада', value: 'us' }]
+            .map((filter) => (
+              <button
+                key={filter.value}
+                onClick={() => setActiveRegion(filter.value as 'ru' | 'world' | 'us')}
+                className={clsx(
+                  'text-white text-sm sm:text-base font-medium transition-opacity',
+                  activeRegion === filter.value ? 'underline underline-offset-4' : 'opacity-50 hover:opacity-80'
+                )}
+              >
+                {filter.label}
+              </button>
+            ))}
         </div>
       </div>
 
@@ -84,14 +91,14 @@ export default function BoxOffice() {
           ))}
         </div>
       ) : (
-        <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-2 scrollbar-hide">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 overflow-x-auto pb-2 scrollbar-hide">
           {movies.map((movie, index) => (
-            <div key={movie.id} className="w-[140px] sm:w-[160px] shrink-0">
+            <div key={movie.id} className="w-full shrink-0">
               <div className="relative h-[210px] sm:h-[230px] w-full rounded-xl overflow-hidden mb-2">
                 <Image
                   src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                   alt={movie.title}
-                  layout="fill"
+                  fill
                   objectFit="cover"
                   className="rounded-xl"
                 />
