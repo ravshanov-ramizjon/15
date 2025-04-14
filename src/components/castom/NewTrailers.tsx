@@ -14,14 +14,38 @@ import {
 } from 'react-icons/fa';
 
 export default function NewTrailers() {
-
     const [movies, setMovies] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedMovie, setSelectedMovie] = useState<any | null>(null);
+    const [trailer, setTrailer] = useState<string | null>(null);  // Для хранения ссылки на трейлер
+
+    const fetchTrailer = async (movieId: number) => {
+        const API_KEY = localStorage.getItem('API_KEY');
+        try {
+            const response = await fetch(
+                `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${API_KEY}&language=ru-RU`
+            );
+            const data = await response.json();
+            if (data.results && data.results.length > 0) {
+                const trailerVideo = data.results.find((video: any) => video.type === 'Trailer');
+                if (trailerVideo) {
+                    setTrailer(`https://www.youtube.com/embed/${trailerVideo.id}`);
+                } else {
+                    setTrailer(null);  // Если трейлер не найден
+                }
+            } else {
+                setTrailer(null);  // Если нет данных о видео
+            }
+        } catch (err) {
+            console.error('Ошибка при загрузке трейлера', err);
+            setTrailer(null);  // В случае ошибки
+        }
+    };
 
     useEffect(() => {
-        const API_KEY = localStorage.getItem('API_KEY');
+        const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
+
         const fetchMovies = async () => {
             setLoading(true);
             setError(null);
@@ -32,6 +56,7 @@ export default function NewTrailers() {
                 const data = await response.json();
                 setMovies(data.results);
                 setSelectedMovie(data.results[0]);
+                await fetchTrailer(data.results[0].id);  // Получаем трейлер для первого фильма
             } catch (err) {
                 setError('Ошибка при загрузке новых трейлеров');
             } finally {
@@ -40,19 +65,28 @@ export default function NewTrailers() {
         };
 
         fetchMovies();
-    }, []);
+    }, []);  // Загрузим фильмы и трейлеры при монтировании компонента
 
-
+    const handleMovieClick = async (movie: any) => {
+        setSelectedMovie(movie);
+        await fetchTrailer(movie.id);  // Загружаем трейлер для нового фильма
+        const newMovies = [...movies];
+        const movieIndex = newMovies.indexOf(movie);
+        // Перемещаем выбранный фильм на верх
+        newMovies.splice(movieIndex, 1);
+        newMovies.unshift(movie); // Добавляем фильм в начало
+        setMovies(newMovies);
+    };
 
     return (
         <div className="mb-8 px-4 py-6 rounded-xl">
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
-                <h2 className="text-3xl md:text-[48px] font-bold text-white">Новые трейлеры</h2>
+            <div className="flex flex-col md:flex-row md:justify-between items-center gap-4 mb-6">
+                <h2 className="text-3xl md:text-[48px] xl:text-[65px] font-bold text-white">Новые трейлеры</h2>
                 <Button
                     variant="link"
                     className="text-white text-sm md:text-base underline-offset-4 hover:underline p-0"
                 >
-                    Все трейлеры →
+                    Все трейлеры → 
                 </Button>
             </div>
 
@@ -70,20 +104,23 @@ export default function NewTrailers() {
                 <div className="text-red-500">{error}</div>
             ) : (
                 <>
-                    <div className="relative w-full h-[250px] sm:h-[300px] md:h-[400px] mb-8 rounded-xl overflow-hidden">
-                        <Image
-                            src={`https://image.tmdb.org/t/p/original${selectedMovie?.backdrop_path}`}
-                            alt={selectedMovie?.title}
-                            fill
-                            className="object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/10" />
-                        <div className="absolute inset-0 flex flex-col justify-end p-6">
-                            <Button className="cursor-pointer absolute inset-0 m-auto w-14 h-14 bg-white text-black rounded-full shadow-lg">
-                                <PlayIcon size={28} />
-                            </Button>
+                    {/* Всплывающее окно с трейлером */}
+                    {trailer ? (
+                        <div className="relative w-full h-[500px] mb-8 rounded-xl overflow-hidden">
+                            <iframe
+                                src={trailer}
+                                width="100%"
+                                height="100%"
+                                title="Movie Trailer"
+                                className="object-cover"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                            ></iframe>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="text-white">Трейлер не доступен</div>
+                    )}
 
                     <div className="w-full rounded-lg p-2 sm:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-center sm:text-left">
@@ -119,12 +156,11 @@ export default function NewTrailers() {
 
                     <div className="flex gap-4 overflow-x-auto scrollbar-hide no-scrollbar pb-2">
                         {movies
-                            .filter((movie) => movie.id !== selectedMovie?.id)
-                            .slice(0, 5)
+                            .slice(1, 11) // Скипаем первый элемент, так как он уже на верхней позиции
                             .map((movie) => (
                                 <Card
                                     key={movie.id}
-                                    onClick={() => setSelectedMovie(movie)}
+                                    onClick={() => handleMovieClick(movie)}  // Перемещаем выбранный трейлер в верх
                                     className="min-w-[160px] md:min-w-[200px] bg-transparent border-none p-0"
                                 >
                                     <div className="relative w-full h-[140px] sm:h-[150px] rounded-lg overflow-hidden">
@@ -142,7 +178,6 @@ export default function NewTrailers() {
                                     </CardContent>
                                 </Card>
                             ))}
-
                     </div>
                 </>
             )}

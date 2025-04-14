@@ -7,11 +7,11 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function UpcomingMovies() {
-    const router = useRouter();
-    const handleMovieClick = (movie: any) => {
-        localStorage.setItem('selectedMovie', JSON.stringify(movie));
-         router.push('/movie-detail');
-      };
+  const router = useRouter();
+  const handleMovieClick = (movie: any) => {
+    localStorage.setItem('selectedMovie', JSON.stringify(movie));
+    router.push('/movie/' + movie.id);
+  };
   const [movies, setMovies] = useState<
     Array<{ id: number; title: string; poster_path: string; release_date: string }>
   >([]);
@@ -40,48 +40,48 @@ export default function UpcomingMovies() {
     fetchMovies();
   }, []);
   const [currentPage, setCurrentPage] = useState(1);
-const moviesPerPage = 4;
+  const moviesPerPage = 4;
 
-const totalPages = Math.ceil(movies.length / moviesPerPage);
+  const totalPages = Math.ceil(movies.length / moviesPerPage);
 
-const handleNextPage = () => {
-  if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
-};
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
+  };
 
-const handlePrevPage = () => {
-  if (currentPage > 1) setCurrentPage((prev) => prev - 1);
-};
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+  };
 
-const paginatedMovies = movies.slice(
-  (currentPage - 1) * moviesPerPage,
-  currentPage * moviesPerPage
-);
+  const paginatedMovies = movies.slice(
+    (currentPage - 1) * moviesPerPage,
+    currentPage * moviesPerPage
+  );
 
   return (
-    <div className="mb-8 px-4">
+    <div className="mb-8 px-4 relative">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h2 className="text-white text-3xl md:text-[48px] lg:text-[65px] font-bold">
+        <h2 className="text-white text-3xl md:text-[48px] xl:text-[65px] font-bold">
           Ожидаемые новинки
         </h2>
-        <div className="flex items-center gap-2 text-white text-sm md:text-base">
-  <button
-    onClick={handlePrevPage}
-    disabled={currentPage === 1}
-    className="p-2 hover:bg-white/10 rounded-full disabled:opacity-30"
-  >
-    <ChevronLeft size={20} />
-  </button>
-  <span className="text-white font-medium">
-    {currentPage} / {totalPages}
-  </span>
-  <button
-    onClick={handleNextPage}
-    disabled={currentPage === totalPages}
-    className="p-2 hover:bg-white/10 rounded-full disabled:opacity-30"
-  >
-    <ChevronRight size={20} />
-  </button>
-</div>
+        <div className="absolute bottom-[-50] left-[155] sm:static sm:bottom-0 sm:left-0 flex items-center gap-2 text-white text-sm md:text-base">
+          <button
+            onClick={handlePrevPage}
+            disabled={currentPage === 1}
+            className="p-2 hover:bg-white/10 rounded-full disabled:opacity-30"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <span className="text-white font-medium">
+            {currentPage} / {totalPages}
+          </span>
+          <button
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+            className="p-2 hover:bg-white/10 rounded-full disabled:opacity-30"
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
 
       </div>
 
@@ -101,12 +101,14 @@ const paginatedMovies = movies.slice(
               onClick={() => handleMovieClick(movie)}
               className="rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200"
             >
-              <div className="relative w-full h-[250]">
+              <div className="relative w-full lg:h-[354px] sm:h-[258px] h-[282px]">
                 <Image
                   src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                   alt={movie.title}
                   fill
                   className="rounded-xl object-cover"
+                  loading="lazy"
+                  sizes="w-full h-full"
                 />
               </div>
               <div className="px-2 pt-3">

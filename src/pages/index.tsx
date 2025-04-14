@@ -1,36 +1,38 @@
+'use client';
 import Header from "@/components/castom/Header";
 import MovieCategoryViewer from "@/components/castom/Main";
-import { useEffect } from "react";
-
-const token = process.env.NEXT_PUBLIC_TOKEN;
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
-
+import Footer from "@/components/castom/Footer";
+import { useEffect, useState } from 'react';
 
 export default function Home() {
+
+  const [offsetY, setOffsetY] = useState(0);
+
   useEffect(() => {
-    if (token && API_KEY) {
-      console.log("Token:", token); 
-      console.log("API_KEY:", API_KEY); 
-  
-      if (token) {
-        localStorage.setItem("token", token);
-      } else {
-        console.log("Token не найден");
-      }
-  
-      if (API_KEY) {
-        localStorage.setItem("API_KEY", API_KEY);
-      } else {
-        console.log("API_KEY не найден");
-      }
-    }
-  }, [token, API_KEY]); 
-  
+    const handleScroll = () => setOffsetY(window.scrollY);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
   return (
-    <div className="bg-[#1f2535] bg-center bg-cover" style={{ backgroundImage: "url('/A1.png')" }}>
+    <div className="relative w-full h-screen overflow-hidden bg-[#1f2535]">
+    <div
+      className="fixed inset-0 z-0 bg-center bg-cover transition-transform duration-300"
+      style={{
+        backgroundImage: "url('/A1.png')",
+        transform: `translateY(-${offsetY * 0.3}px)`, // плавный параллакс
+      }}
+    ></div>
+
+    {/* Затемнение поверх фона */}
+    <div className="fixed inset-0 z-10 " />
+
+    {/* Контент со скроллом */}
+    <div className="relative z-20 h-screen overflow-y-auto scroll-smooth">
       <Header />
       <MovieCategoryViewer />
+      <Footer />
     </div>
+  </div>
   );
 }
 

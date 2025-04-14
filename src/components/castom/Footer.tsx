@@ -8,7 +8,7 @@ import {
 export default function Footer() {
     return (
         <footer className="text-white py-12 px-4">
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-300 mx-auto">
                 <div className=" rounded-lg px-6 py-10 text-center relative overflow-hidden bg-[#1D3AA0E5]">
                     <div className="absolute bg-[#1D3AA0E5] inset-0 opacity-10 bg-cover bg-center" style={{ backgroundImage: `url('/fon.png')` }} />
                     <div className="relative z-10">

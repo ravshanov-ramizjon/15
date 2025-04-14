@@ -20,12 +20,12 @@ export default function PopularPeople() {
   const [activeFilter, setActiveFilter] = useState<string>('За год');
   const router = useRouter();
   const handleMovieClick = (movie: any) => {
-      localStorage.setItem('selectedMovie', JSON.stringify(movie));
-      router.push('/movie-detail');
+      localStorage.setItem('selectedPerson', JSON.stringify(movie));
+      router.push(`/person/${movie.id}`);
   };
 
   useEffect(() => {
-    const API_KEY = localStorage.getItem('API_KEY');
+    const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
     const fetchPeople = async () => {
       setLoading(true);
       setError(null);
@@ -48,8 +48,8 @@ export default function PopularPeople() {
 
   return (
     <div className="flex flex-col mb-10 px-4">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h2 className="text-3xl sm:text-5xl md:text-[65px] font-bold text-white">
+      <div className="lg:flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 lg:mb-6">
+        <h2 className="text-3xl sm:text-5xl xl:text-[65px] sm:pb-7 lg:p-0 font-bold text-white">
           Популярные персоны
         </h2>
         <div className="flex gap-4">
@@ -78,16 +78,18 @@ export default function PopularPeople() {
             {people.slice(0, 2).map((person, index) => (
               <Card
                 key={person.id}
-                className="w-full sm:w-1/2 overflow-hidden border-none bg-muted"
+                className="w-full sm:w-1/2 overflow-hidden border-none bg-muted p-0 pt-4"
                 onClick={() => handleMovieClick(person)}
               >
                 <CardHeader className="p-0">
-                  <div className="relative w-full h-80">
+                  <div className="relative w-full h-[444px]">
                     <Image
                       src={`https://image.tmdb.org/t/p/w500${person.profile_path}`}
                       alt={person.name}
                       fill
                       className="object-cover rounded-t-lg"
+                      loading="lazy"
+                      sizes="w-full h-80"
                     />
                     <CardContent className="p-4 absolute bottom-0 left-0">
                       <CardTitle className="text-[22px] md:text-[27px] text-white">
@@ -105,11 +107,11 @@ export default function PopularPeople() {
             ))}
           </div>
 
-          <div className="w-full lg:w-1/3 bg-muted rounded-lg p-4">
+          <div className="w-full lg:w-1/3 bg-muted rounded-lg ">
             {people.slice(2, 8).map((person, index) => (
               <div
                 key={person.id}
-                className="flex justify-between items-center py-2 border-b border-white/10 last:border-none"
+                className="flex justify-between items-center py-2 border-b border-[#1E2538] last:border-none"
                 onClick={() => handleMovieClick(person)}
               >
                 <div>

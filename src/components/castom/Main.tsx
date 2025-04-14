@@ -18,7 +18,6 @@ export default function MovieCategoryViewer() {
                 <LatestNews />
                 <UpcomingMovies />
                 <BoxOffice />
-                <Footer />
             </div>
         </div>
     );
